@@ -16,7 +16,7 @@
 
 	session.setAttribute("payment_registration_status", status);
 	
-	response.sendRedirect("payment-register.jsp");
+	response.sendRedirect("payment_register.jsp");
 %>
 
 </body>

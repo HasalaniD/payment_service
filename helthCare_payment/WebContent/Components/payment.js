@@ -1,7 +1,7 @@
 $(document).ready(function()
 { 
 //hide area of error messages
-	$("#appoinmentID_error").hide();
+	$("#appointmentID_error").hide();
 	$("#Type_error").hide(); 
 	$("#cardNo_error").hide(); 
 	$("#securityCode_error").hide(); 
@@ -11,7 +11,7 @@ $(document).ready(function()
 	$("#phoneNo_error").hide();
 	
 //check the validation ID
-	$("#appoinmentID_error").focusout(function(){
+	$("#appointmentID_error").focusout(function(){
 		appoinmentID();
 	});
 	
@@ -58,33 +58,185 @@ $(document).ready(function()
 	$("#email").focusout(function() {
 		vEmail = checkEmail();
 	});
+});
 	
-	
-	$(document).on("click", "#signin-button", function(event) {
+	$(document).on("click", "#pay-button", function(event) {
+		$("#alertSuccess").text("");
+		$("#alertSuccess").hide();
+		$("#alertError").text("");
+		$("#alertError").hide();
 
-		let idStatus = idRequired();
-		let typeStatus = typeRequired();
-		let cnoStatus = cnoRequired();
-		let scodeStatus = scodeRequired();
-		let nameStatus = nameRequired();
-		let edateStatus = edateRequired();
-		let emailStatus = emailRequired();
-		let pnoStatus = pnoRequired();
-	
-		$("#registration-form").submit(function() {
-			if (idStatus == false || typeStatus == false || cnoStatus == false || scodeStatus == false || nameStatus == false || edateStatus == false || emailStatus == false || pnoStatus == false)
-				{
-				return false;
-				}
-			else if(vEmail == false)
-				{
-			else {
-				return true;
+
+		var status = validateItemForm();
+
+		if (status != true) {
+			$("#alertError").text(status);
+			$("#alertError").show();
+			return;
+		}
+
+		// If valid------------------------
+		var method = ($("#hidField").val() == "save") ? "POST" : "PUT";
+
+		$.ajax({
+			url : "PaymentAPI",
+			type : method,
+			data : $("#registration-form").serialize(),
+			dataType : "text",
+			complete : function(response, status) {
+				registerComplete(response.responseText, status);
 			}
-				});
-			
-				});
 		});
+	});
+	
+	$(document).on(
+			"click",
+			".btnUpdate",
+			function(event) {
+				$("#hidField").val(
+						$(this).closest("tr").find('#hidFieldUpdate').val());
+				$("#appoinmentID").val($(this).closest("tr").find('td:eq(0)').text());
+				// $("#cardType").val($(this).closest("tr").find('td:eq(1)').text());
+				$("#cardNo").val($(this).closest("tr").find('td:eq(2)').text());
+				$("#securityCode").val($(this).closest("tr").find('td:eq(3)').text());
+				$("#nameOnCard").val($(this).closest("tr").find('td:eq(4)').text());
+				$("#expirationDate").val($(this).closest("tr").find('td:eq(5)').text());
+				$("#email").val($(this).closest("tr").find('td:eq(6)').text());
+				$("#phoneNo").val($(this).closest("tr").find('td:eq(7)').text());
+			});
+	
+	function registerComplete(response, status)
+	{
+		if (status == "success")
+		{
+			var resultSet = JSON.parse(response);
+			if (resultSet.status.trim() == "success")
+			{
+				$("#alertSuccess").text("Successfully saved.");
+				$("#alertSuccess").show();
+				$("#divItemsGrid").html(resultSet.data);
+			} 
+			else if (resultSet.status.trim() == "error")
+			{
+				$("#alertError").text(resultSet.data);
+				$("#alertError").show();
+			}
+		} 
+		else if (status == "error")
+		{
+			$("#alertError").text("Error while saving.");
+			$("#alertError").show();
+		} 
+		else
+		{
+			$("#alertError").text("Unknown error while saving..");
+			$("#alertError").show();
+		}
+		
+		$("#hidField").val("save");
+		$("#registration-form")[0].reset();
+	}
+	
+	$(document).on("click", ".btnRemove", function(event)
+			{
+				$.ajax(
+				{
+					url : "PaymentAPI",
+					type : "DELETE",
+					data : "appoinmentID=" + $(this).data("appoinmentID"),
+					dataType : "text",
+					complete : function(response, status)
+					{
+						deleteComplete(response.responseText, status);
+					}
+				});
+			});
+
+	// Delete
+	function deleteComplete (response, status)
+	{
+		if (status == "success")
+		{
+			var resultSet = JSON.parse(response);
+			
+			if (resultSet.status.trim() == "success")
+			{
+				$("#alertSuccess").text("Successfully deleted.");
+				$("#alertSuccess").show();
+				$("#divItemsGrid").html(resultSet.data);
+			} 
+			else if (resultSet.status.trim() == "error")
+			{
+				$("#alertError").text(resultSet.data);
+				$("#alertError").show();
+			}
+		} 
+		else if (status == "error")
+		{
+			$("#alertError").text("Error while deleting.");
+			$("#alertError").show();
+		} 
+		else
+		{
+			$("#alertError").text("Unknown error while deleting..");
+			$("#alertError").show();
+		}
+	}
+
+
+	// Validation
+	function validateItemForm()
+	{
+		// Appointment ID is required
+		if ($("#appoinmentID").val().trim() == "")
+		{
+			return "Insert Appointment ID";
+		}
+		
+		// card Type is required
+		if ($("#cardType").val().trim() == "")
+		{
+			return "Insert Card Type";
+		}
+		
+		// card No is required
+		if ($("#cardNo").val().trim() == "")
+		{
+			return "Insert Card No";
+		}
+		
+		// security Code is required
+		if ($("#securityCode").val().trim() == "")
+		{
+			return "Insert Security Code";
+		}
+		
+		// name On Card is required
+		if ($("#nameOnCard").val().trim() == "")
+		{
+			return "Insert Name On Card";
+		}
+				
+		// expiration Date is required
+		if ($("#expirationDate").val().trim() == "")
+		{
+			return "Insert Expiration Date";
+		}
+		
+		// email is required
+		if ($("#email").val().trim() == "")
+		{
+			return "Insert Email";
+		}
+		
+		// phone No is required
+		if ($("#phoneNo").val().trim() == "")
+		{
+			return "Insert Phone No";
+		}
+		
+		return true;
+	}	
 
 //email validation
 function checkEmail() {
@@ -101,16 +253,16 @@ function checkEmail() {
 	}
 }
 
-//Appoinment ID is required field
+//appointment ID is required field
 function aIDRequired() {
-	if ($("#appoinmentID").val().trim() == "") {
-		$("#appoinmentID_error").html("This field is required");
-		$("#appoinmentID_error").show();
+	if ($("#appointmentID").val().trim() == "") {
+		$("#appointmentID_error").html("This field is required");
+		$("#appointmentID_error").show();
 		return false;
 	}
 }
 
-//Card Type is required field
+//card Type is required field
 function cTypeRequired() {
 	if ($("#card_Type").val().trim() == "") {
 		$("#Type_error").html("This field is required");
@@ -119,7 +271,7 @@ function cTypeRequired() {
 	}
 }
 
-//Card Number is required field
+//card Number is required field
 function cNoRequired() {
 	if ($("#card_no").val().trim() == "") {
 		$("#cardNo_error").html("This field is required");
@@ -128,7 +280,7 @@ function cNoRequired() {
 	}
 }
 
-//Security Code is required field
+//security Code is required field
 function sCodeRequired() {
 	if ($("#security_code").val().trim() == "") {
 		$("#securityCode_error").html("This field is required");
@@ -137,7 +289,7 @@ function sCodeRequired() {
 	}
 }
 
-//Name on Card is required field
+//name on Card is required field
 function nameOnCardRequired() {
 	if ($("#name_on_card").val().trim() == "") {
 		$("#nameOnCard_error").html("This field is required");
@@ -146,7 +298,7 @@ function nameOnCardRequired() {
 	}
 }
 
-//Expiration Date is required field
+//expiration Date is required field
 function exDateRequired() {
 	if ($("#ex_date").val().trim() == "") {
 		$("#expirationdate_error").html("This field is required");
@@ -155,16 +307,16 @@ function exDateRequired() {
 	}
 }
 
-//Email is required field
+//email is required field
 function emailRequired() {
-	if ($("email"").val().trim() == "") {
+	if ($("email").val().trim() == "") {
 		$("#email_error").html("This field is required");
 		$("#email_error").show();
 		return false;
 	}
 }
 
-//Phone Number is required field
+//phone Number is required field
 function pNoRequired() {
 	if ($("#phone_no").val().trim() == "") {
 		$("#phoneNo_error").html("This field is required");
@@ -172,9 +324,3 @@ function pNoRequired() {
 		return false;
 	}
 }
-
-	
-	
-	
-	
-	});

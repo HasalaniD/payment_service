@@ -2,27 +2,7 @@
 <%@page import="com.paf.payment.bean.Payment"%>
 
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-    pageEncoding="ISO-8859-1"%>
-    
-<%
-	if(request.getParameter("appoinmentID") != null){
-	String appoinmentID = request.getParameter("appoinmentID");
-	String cardType = request.getParameter("cardType");
-	String cardNo = request.getParameter("cardNo");
-	String securityCode = request.getParameter("securityCode");
-	String nameOnCard = request.getParameter("nameOnCard");
-	String expirationDate = request.getParameter("expirationDate");
-	String email = request.getParameter("email");
-	String phoneNo = request.getParameter("phoneNo");
-	
-	Payment p = new Payment(appoinmentID, cardType, cardNo, securityCode, nameOnCard, expirationDate, email, phoneNo);
-	
-	String status = PaymentDAO.registerPayment(p);
-	
-	session.setAttribute("payment_registration_status", status);
-	
-	}
-%>    
+    pageEncoding="ISO-8859-1"%>   
        
 <!DOCTYPE html>
 <html>
@@ -45,10 +25,10 @@ integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9If
 
             <form id="registration-form" action="payment_register.jsp">
                 <div class="form-group row">
-                    <label for="appoinmentID" class="col-sm-2 col-form-label">Appointment ID<span class="required-sign">(*)</span></label>
+                    <label for="appointmentID" class="col-sm-2 col-form-label">Appointment ID<span class="required-sign">(*)</span></label>
                     <div class="col-sm-10">
-                        <input type="text" id="appoinmentID" name="appoinmentID" class="form-control">
-                         <span class="error_message" id="appoinmentID_error"></span>
+                        <input type="text" id="appointmentID" name="appointmentID" class="form-control">
+                         <span class="error_message" id="appointmentID_error"></span>
                     </div>
                 </div>
                 <div class="form-group row">
@@ -105,7 +85,7 @@ integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9If
                     </div>
                     <div class="form-group row">
                     <div class="col-sm-10">
-                      <button type="submit" id="submit" class="btn btn-success">Pay</button>
+                      <button type="submit" id="pay-button" class="btn btn-success">Pay</button>
                     </div>
                 </div>
             </form>
@@ -119,6 +99,16 @@ integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9If
             </div>
              
         </fieldset>
+    </div>
+    <div class ="row">
+    <div class="col-12" id="displayPayments">
+    	<fieldset>
+            <h3>
+                <span> Payment Details</span>
+            </h3>
+            </fieldset>
+            <%=PaymentDAO.paymentList()%>
+    </div>   
     </div>
 </body>
 </html>

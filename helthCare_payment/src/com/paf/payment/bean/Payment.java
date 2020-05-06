@@ -14,6 +14,11 @@ public class Payment {
 	public Payment() {
 		
 	}
+	
+	public Payment(String appoinmentID) {
+		this.appoinmentID = appoinmentID;
+	}
+
 	public Payment(String appoinmentID, String cardType, String cardNo, String securityCode, String nameOnCard,
 			String expirationDate, String email, String phoneNo) {
 		this.appoinmentID = appoinmentID;

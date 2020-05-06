@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.paf.doctor.bean.Doctor;
 import com.paf.payment.bean.Payment;
 
 public class PaymentDAO {
@@ -47,12 +46,12 @@ public class PaymentDAO {
 						
 			ps.executeUpdate();
 			
-			output = "Payment Successful";
+			String newItems = paymentList();
+			output = "{\"status\":\"success\", \"data\": \"" + newItems + "\"}";
 			
 		} catch (Exception e) {
+			output = "{\"status\":\"error\", \"data\": \"Error while inserting the item.\"}";
 			e.printStackTrace();
-			
-			output = "Error in registration process";
 		}
 		
 		return output;
@@ -82,10 +81,12 @@ public class PaymentDAO {
 			
 			ps.executeUpdate();
 			
-			status = "Payment Update Successfully";
+			String newItems = paymentList();
+			status = "{\"status\":\"success\", \"data\": \"" + newItems + "\"}";
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			status = "Error in update process";
+			status = "{\"status\":\"error\", \"data\": \"Error in update process.\"}";
 		}
 		
 		return status;
@@ -105,11 +106,13 @@ public class PaymentDAO {
 			
 			ps.execute();
 			
-			status = "Payment deleted successfuly";
+			String newItems = paymentList();
+			status = "{\"status\":\"success\", \"data\": \"" + newItems + "\"}";
+			
 		} catch (Exception e) {
 			// TODO: handle exception
+			status = "{\"status\":\"error\", \"data\": \"Error in deleting process.\"}";
 			e.printStackTrace();
-			status = "Error in deleting process.";
 		}
 		
 		return status;
@@ -129,7 +132,8 @@ public class PaymentDAO {
 					"</head>" + 
 					"<body>" +
 					"<table border=\"1\"><tr><th>Appoinment ID</th><th> Card Type</th><th>Card Number</th><th>Security code</th>" +
-					"<th>Name on card</th>" + "<th>Expiration date</th>" + "<th>email</th>" + "<th>Phone Number</th></tr>";
+					"<th>Name on card</th>" + "<th>Expiration date</th>" + "<th>email</th>" + "<th>Phone Number</th>"+
+					"<th>Update</th><th>Remove</th></tr>";
 			
 			String query = "select * from healthcare_payment";
 			Statement statement = con.createStatement();
@@ -153,7 +157,9 @@ public class PaymentDAO {
 				output += "<td>" + expirationDate + "</td>";
 				output += "<td>" + email + "</td>";
 				output += "<td>" + phoneNo + "</td>";
-				
+				output += "<td><input name='btnUpdate' type='button' value='Update' class='btnUpdate btn btn-primary'></td>";
+				output += "<td>"
+						+ "<input name='btnDelete' type='button' value='Delete' class='btn btn-danger btnRemove' data-appoinmentID ='" + appoinmentID  + "'></td>";
 				output += "</tr>";
 			}
 		}catch (Exception e) {
